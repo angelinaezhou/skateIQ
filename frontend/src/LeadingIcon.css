@@ -1,0 +1,13 @@
+.square {
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background-color: #E0ECF2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.leading-icon {
+    display: block;
+}

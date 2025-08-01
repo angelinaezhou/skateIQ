@@ -1,0 +1,23 @@
+.App {
+  justify-content: center;
+  align-items: center;
+}
+
+.background {
+  width: 655px;
+  height: 668px;
+  position: fixed;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+  z-index: -1;
+}
+
+.test {
+  z-index: 20;
+  position: fixed;
+  top: 35%;
+  left: 50%; 
+  transform: translate(-50%, -50%);
+}

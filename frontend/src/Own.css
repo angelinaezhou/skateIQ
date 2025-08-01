@@ -1,0 +1,178 @@
+/* Add these styles to your existing own.css */
+.own {
+    width: 509px;
+    height: 51px;
+    background-color: #FAFDFF;
+    align-items: center;
+    display: flex;
+    padding-left: 7px;
+    /* transition: all 0.2s ease; - Remove this to test */
+    position: relative;
+    /* Remove any border properties */
+}
+
+.own:hover {
+    background-color: #F3F9FD;
+    cursor: pointer;
+}
+
+.text {
+    margin-top: 7px;
+    padding-left: 15px;
+    width: 244px;
+    height: 51px;
+    display: flex;
+    flex-direction: column;
+}
+
+.title {
+    width: 244px;
+    height: 17px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 550;
+    font-size: 12px;
+    color: #475463;
+    margin-top: 2px;
+    letter-spacing: 3%;
+}
+
+.subtitle {
+    width: 244px;
+    height: 13px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: 550;
+    font-size: 10px;
+    color: #C4CBD0;
+    letter-spacing: 3%;
+}
+
+/* State-specific styling - Test each property individually */
+.own.processing {
+    background-color: rgba(245, 158, 11, 0.1);
+    /* Comment out properties one by one to find the culprit */
+    /* opacity: 0.7; */
+    /* pointer-events: none; */
+}
+
+.own.video-ready {
+    background-color: rgba(59, 130, 246, 0.1);
+}
+
+.own.results {
+    background-color: rgba(16, 185, 129, 0.1);
+}
+
+.own.error {
+    background-color: rgba(239, 68, 68, 0.1);
+}
+
+.own.playing-video {
+    background-color: rgba(139, 69, 19, 0.1);
+    /* opacity: 0.8; */
+}
+
+/* Reset button */
+.reset-button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.2s ease;
+}
+
+.reset-button:hover {
+    background: rgba(255, 255, 255, 1);
+    border-color: #d1d5db;
+}
+
+/* Video modal styles */
+.video-modal {
+    position: fixed;
+    width: 630px;
+    height: 452px;
+    z-index: 1000;
+    transform: translate(-50%, -50%);
+    top: 140px;
+    left: 280px;
+}
+
+.video-container {
+    position: relative;
+    width: 560px;
+    height: 400px;
+    background-color: #f1f3f5;
+    border-radius: 30px;
+    padding: 20px;
+    box-shadow:
+        inset 0 0 60px rgb(225, 238, 255),
+        0 4px 20px rgba(0, 0, 0, 0.6);
+}
+
+.close-button {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.7);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.close-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+.video {
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.video-info {
+    margin-top: 1rem;
+    text-align: center;
+}
+
+.video-info h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.video-info p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+.classification-result {
+    background-color: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 8px;
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.classification-result p {
+    margin: 5px 0;
+}
+
+.own.processing .leading-icon {
+    animation: spin 1s linear infinite;
+    /* Prevent the rotation from affecting layout */
+    display: inline-block;
+    transform-origin: center center;
+}

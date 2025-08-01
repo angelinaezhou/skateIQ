@@ -1,0 +1,10 @@
+.skaters-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 2 columns of equal width */
+    grid-template-rows: repeat(3, 1fr); /* 3 rows of equal height */
+    column-gap: 3px; /* 3px spacing between columns */
+    row-gap: 5px; /* 5px spacing between rows */
+    width: 509px;
+    height: 163px;
+  }
+  
