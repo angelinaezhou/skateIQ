@@ -25,10 +25,12 @@ existing/
 
 # OS files
 .DS_Store
+**/.DS_Store
 Thumbs.db
 
 # Node modules (if any)
 node_modules/
+**/node_modules/
 .npm
 
 # IDE files
