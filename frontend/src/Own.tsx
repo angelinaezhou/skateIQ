@@ -9,7 +9,7 @@ type OwnProps = {
   onClassificationResult?: (result: any) => void;
 };
 
-type ComponentState = 'upload' | 'processing' | 'video-ready' | 'playing-video' | 'results';
+type ComponentState = 'upload' | 'processing' | 'video-ready' | 'playing-video' | 'results' | 'video-results';
 
 type UploadResult = {
   video_id: string;
@@ -20,6 +20,11 @@ type UploadResult = {
   confidence?: number;
   all_probabilities?: { [key: string]: number };
   classification?: string;
+  top_predictions?: Array<{
+    rank: number;
+    jump_type: string; 
+    probability: number;
+  }>;
 };
 
 export default function Own({ onUploadSuccess, onUploadError, onClassificationResult }: OwnProps) {
@@ -27,10 +32,13 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
   const [state, setState] = useState<ComponentState>('upload');
   const [uploadResult, setUploadResult] = useState<UploadResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isClassifying, setIsClassifying] = useState(false);
 
   // Create video URL for uploaded file (you'll need to serve uploaded videos)
   const getVideoUrl = (videoId: string) => {
-    return `http://localhost:8000/uploads/${videoId}.mp4`; // Adjust based on your backend
+    const url = `http://localhost:8000/api/video/${videoId}`;
+    console.log(`🎥 Video URL for ${videoId}: ${url}`);
+    return url;
   };
 
   const handleClick = () => {
@@ -146,10 +154,10 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
   const handleVideoEnd = async () => {
     if (!uploadResult) return;
     
-    setState('processing');
+    setIsClassifying(true);
     
     try {
-      const response = await fetch('http://localhost:8000/api/classify-jump', {
+      const response = await fetch('http://localhost:8000/api/classify-own-jump', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -174,13 +182,14 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
       };
       
       setUploadResult(finalResult);
-      setState('results');
+      setState('video-results');
       onClassificationResult?.(finalResult);
 
     } catch (error) {
       console.error('❌ Classification error:', error);
       setError(error instanceof Error ? error.message : 'Classification failed');
-      setState('video-ready');
+    } finally {
+      setIsClassifying(false);
     }
   };
 
@@ -207,9 +216,9 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
 
   const getIconColor = () => {
     switch (state) {
-      case 'processing': return '#f59e0b'; // amber
-      case 'results': return '#10b981'; // green
-      case 'video-ready': return '#3b82f6'; // blue
+      case 'processing': return '#9187DB'; 
+      case 'results': return '#74C29E';
+      case 'video-ready': return '#5277C7'; 
       default: return undefined;
     }
   };
@@ -228,7 +237,7 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
   const getSubtitle = () => {
     switch (state) {
       case 'upload': return '.mp4, .mov, .avi files allowed';
-      case 'processing': return 'Analyzing with AI...';
+      case 'processing': return 'Extracting movement...';
       case 'video-ready': return 'Click to play and analyze';
       case 'playing-video': return 'Video will auto-classify when finished';
       case 'results': return `Confidence: ${uploadResult?.confidence ? (uploadResult.confidence * 100).toFixed(1) : 0}%`;
@@ -248,7 +257,7 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
         <LeadingIcon 
           icon={getIcon()} 
           size={20} 
-          strokeWidth={4}
+          strokeWidth={3.5}
           color={getIconColor()}
         />
         <div className="text">
@@ -264,7 +273,7 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
               resetComponent();
             }}
           >
-            <RotateCcw size={16} />
+            <RotateCcw size={25} strokeWidth={3}/>
           </button>
         )}
       </div>
@@ -280,7 +289,7 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
       />
 
       {/* Video Modal */}
-      {state === 'playing-video' && uploadResult && (
+      {(state === 'playing-video' || state === 'video-results') && uploadResult && (
         <div className="video-modal">
           <div className="video-container">
             <button className='close-button' onClick={closeVideo}>
@@ -291,7 +300,6 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
               className="video"
               src={getVideoUrl(uploadResult.video_id)}
               controls
-              autoPlay
               onEnded={handleVideoEnd}
               style={{width: '100%', maxWidth:'500px'}}
             >
@@ -299,8 +307,42 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
             </video>
 
             <div className="video-info">
-              <h4>{uploadResult.original_filename}</h4>
-              <p>Video will be analyzed when playback ends</p>
+              {state === 'playing-video' && !isClassifying && (
+                <p className="playback">video will be analyzed when playback ends:</p>
+              )}
+              {state === 'video-results' && uploadResult.top_predictions && !isClassifying && (
+                <div className="classification-result">
+                  <div className="top-predictions">
+                    <h4>top predictions:</h4>
+                    {uploadResult.top_predictions.slice(0, 3).map((pred, index) => (
+                      <div key={index} className="prediction-item">
+                        <div className="prediction-header">
+                          <span className="prediction-rank">#{pred.rank}</span>
+                          <span className="prediction-name">{pred.jump_type.toLowerCase()}</span>
+                          <span className="prediction-percentage">{(pred.probability * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="confidence-bar">
+                          <div 
+                            className="confidence-fill" 
+                            style={{
+                              width: `${pred.probability * 100}%`,
+                              backgroundColor: index === 0 ? '#698DE9' : index === 1 ? '#AEC1F0' : '#D9E1F6'
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {/* Fallback for when top_predictions isn't available */}
+              {state === 'video-results' && !uploadResult.top_predictions && uploadResult.jump_type && !isClassifying && (
+                <div>
+                  <p>Analysis complete!</p>
+                  <p><strong>Jump Type:</strong> {uploadResult.jump_type}</p>
+                  <p><strong>Confidence:</strong> {(uploadResult.confidence! * 100).toFixed(1)}%</p>
+                </div>
+              )}
             </div>
           </div>
         </div>

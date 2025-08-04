@@ -1,7 +1,7 @@
 /* each of the skater's individual selection */
 import "./Skaters.css"
 import LeadingIcon from "./LeadingIcon";
-import { Play, X } from "lucide-react"
+import { Play, X, Video, SquarePlay, Clapperboard } from "lucide-react"
 import { useState } from "react"
 
 type skatersProps = {
@@ -11,19 +11,30 @@ type skatersProps = {
   onSelect?: (name: string, event: string, filename: string) => void;
 };
 
+type ClassificationResult = {
+  jump_type: string;
+  confidence: number;
+  all_probabilities?: { [key: string]: number};
+  top_predictions?: Array<{
+    rank: number;
+    jump_type: string; 
+    probability: number;
+  }>;
+} | null;
+
 export default function Skaters({ name, event, filename, onSelect }: skatersProps) {
   const [showVideo, setShowVideo] = useState(false);
-  const [classificationResult, setClassificationResult] = useState<string | null>(null);
+  const [classificationResult, setClassificationResult] = useState<ClassificationResult>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
   const getVideoPath = (name: string, event: string) => {
     const videoMap: { [key: string]: string } = {
-      "Yuna Kim-2010 Olympics Free Skate": "/programs/yuna_2010.mp4",
-      "Alina Zagitova-2018 Olympics Short Program": "/programs/alina_2018.mp4",
-      "Yuzuru Hanyu-2018 Olympics Short Program": "/programs/yuzuru_2018.mp4",
-      "Yulia Lipnitskaya-2014 Olympics Free Skate": "/programs/yulia_2014.mp4",
-      "Nathan Chen-2022 Olympics Short Program": "/programs/nathan_2022.mp4",
-      "Yuna Kim-2014 Olympics Short Program": "/programs/yuna_2014.mp4",
+      "Yuna Kim-2010 Olympics Free Skate": "/programs/yuna_lutz.mp4",
+      "Alina Zagitova-2018 Olympics Short Program": "/programs/alina_loop.mp4",
+      "Yuzuru Hanyu-2018 Olympics Short Program": "/programs/yuzuru_axel.mp4",
+      "Yuzuru Hanyu-2018 Olympics Free Skate": "/programs/yuzuru_sal.mp4",
+      "Nathan Chen-2022 Olympics Free Skate": "/programs/nathan_flip.mp4",
+      "Yuna Kim-2014 Olympics Short Program": "/programs/yuna_toe.mp4",
     };
     return videoMap[`${name}-${event}`] || "";
   }
@@ -65,11 +76,14 @@ export default function Skaters({ name, event, filename, onSelect }: skatersProp
 
       const result = await response.json();
       console.log('✅ Classification result:', result);
-      setClassificationResult(result.classification);
+      setClassificationResult(result);
       
     } catch (error) {
       console.error('❌ Classification failed:', error);
-      setClassificationResult('Classification failed - check backend connection');
+      setClassificationResult({
+        jump_type: 'Classification failed - check backend connection',
+        confidence: 0,
+      });
     } finally {
       setIsProcessing(false);
     }
@@ -87,7 +101,7 @@ export default function Skaters({ name, event, filename, onSelect }: skatersProp
   return (
     <>
       <div className="skater" onClick={handleClick} style={{cursor: 'pointer'}}>
-        <LeadingIcon icon={Play} size={20} strokeWidth={4} />
+        <LeadingIcon icon={Clapperboard} size={20} strokeWidth={2.9} />
         <div className="description">
           <div className="title">{name}</div>
           <div className="event">{event}</div>
@@ -100,22 +114,35 @@ export default function Skaters({ name, event, filename, onSelect }: skatersProp
             <video className="video"
               src={getVideoPath(name, event)}
               controls
-              autoPlay
               onEnded={handleVideoEnd}
-              style={{width: '100%', maxWidth:'500px'}}
             >
               Your browser does not support the video tag.
             </video>
-            {isProcessing && (
-              <div className="processing">
-                <p>Analyzing jump...</p>
-                <div className="spinner"></div>
-              </div>
-            )}
             {classificationResult && (
-              <div className='classification-result'>
-                <h3>Jump Detected:</h3>
-                <p>{classificationResult}</p>
+              <div className="classification-result">
+                {classificationResult.top_predictions && (
+                  <div className="top-predictions">
+                    <h4>top predictions:</h4>
+                    {classificationResult.top_predictions.slice(0, 3).map((pred, index) => (
+                      <div key={index} className="prediction-item">
+                        <div className="prediction-header">
+                          <span className="prediction-rank">#{pred.rank}</span>
+                          <span className="prediction-name">{pred.jump_type.toLowerCase()}</span>
+                          <span className="prediction-percentage">{(pred.probability * 100).toFixed(1)}%</span>
+                        </div>
+                        <div className="confidence-bar">
+                          <div 
+                            className="confidence-fill" 
+                            style={{
+                              width: `${pred.probability * 100}%`,
+                              backgroundColor: index === 0 ? '#698DE9' : index === 1 ? '#AEC1F0' : '#D9E1F6'
+                            }}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

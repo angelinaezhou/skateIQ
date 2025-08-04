@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+.env
+pose_env/
+venv/
+env/
+
+# Data files
+*.npy
+*.pkl
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# Upload directories
+uploads/
+frames/
+existing/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Node modules (if any)
+node_modules/
+.npm
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
