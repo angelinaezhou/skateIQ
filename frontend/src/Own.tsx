@@ -2,6 +2,7 @@ import { useRef, useState } from "react"
 import "./Own.css"
 import LeadingIcon from "./LeadingIcon"
 import { Upload, CheckCircle, AlertCircle, Clock, Play, X, RotateCcw } from "lucide-react"
+import { API_BASE_URL } from "./config"
 
 type OwnProps = {
   onUploadSuccess?: (result: any) => void;
@@ -36,7 +37,7 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
 
   // Create video URL for uploaded file (you'll need to serve uploaded videos)
   const getVideoUrl = (videoId: string) => {
-    const url = `http://localhost:8000/api/video/${videoId}`;
+    const url = `${API_BASE_URL}/video/${videoId}`;
     console.log(`🎥 Video URL for ${videoId}: ${url}`);
     return url;
   };

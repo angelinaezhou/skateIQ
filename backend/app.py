@@ -12,7 +12,6 @@ from werkzeug.utils import secure_filename
 import time
 import threading
 
-# Add this near the top after your folder setup
 UPLOADS_FOLDER = Path('uploads')
 UPLOADS_FOLDER.mkdir(exist_ok=True)
 
@@ -21,7 +20,7 @@ def cleanup_old_files():
     while True:
         try:
             current_time = time.time()
-            one_hour_ago = current_time - 3600  # 1 hour in seconds
+            one_hour_ago = current_time - 3600 
             
             # Clean uploads folder (videos)
             if UPLOADS_FOLDER.exists():
@@ -40,23 +39,23 @@ def cleanup_old_files():
             print(f"🧹 Cleanup completed at {time.strftime('%Y-%m-%d %H:%M:%S')}")
                         
         except Exception as e:
-            print(f"❌ Cleanup error: {e}")
+            print(f"Cleanup error: {e}")
         
-        time.sleep(3600)  # Wait 1 hour before next cleanup
+        time.sleep(3600)
 
 app = Flask(__name__)
-CORS(app)  # Enable CORS for your React app
+CORS(app)
 
 CONFIDENCE_THRESHOLD = 0.30
 
-# Load your trained model and scaler
-with open('model.pkl', 'rb') as f:
+# load trained model and scaler
+with open('models/model.pkl', 'rb') as f:
     model = pickle.load(f)
 
-with open('scaler.pkl', 'rb') as f:
+with open('models/scaler.pkl', 'rb') as f:
     scaler = pickle.load(f)
 
-# Constants from your training script
+# constants from training script
 MAX_FRAMES = 30
 POSE_DIM = 132
 TARGET_LEN = 30
@@ -83,10 +82,10 @@ def center_landmarks(landmarks):
         left_hip = landmarks[mp_pose.PoseLandmark.LEFT_HIP.value][:3]  # x,y,z
         right_hip = landmarks[mp_pose.PoseLandmark.RIGHT_HIP.value][:3]  # x,y,z
         center = (left_hip + right_hip) / 2
-        centered = landmarks[:, :3] - center  # Center x,y,z (not just x,y)
-        return np.concatenate([centered, landmarks[:, 3:4]], axis=1)  # Add back visibility
+        centered = landmarks[:, :3] - center
+        return np.concatenate([centered, landmarks[:, 3:4]], axis=1) 
     except Exception as e:
-        print(f"⚠️ Warning: Could not center landmarks: {e}")
+        print(f"Warning: Could not center landmarks: {e}")
         return landmarks
     
 def resample_pose_sequence(pose_seq, target_len=TARGET_LEN):
@@ -103,7 +102,7 @@ def resample_pose_sequence(pose_seq, target_len=TARGET_LEN):
 def process_video_from_bytes(file_bytes, original_filename):
     """Process video file from bytes in memory"""
 
-    # temporary file that gets automatically delted
+    # temporary file that gets automatically deleted
     with tempfile.NamedTemporaryFile(delete=True, suffix='.mp4') as temp_file:
         temp_file.write(file_bytes)
         temp_file.flush()
@@ -112,7 +111,7 @@ def process_video_from_bytes(file_bytes, original_filename):
         all_landmarks = []
 
         if not cap.isOpened():
-            raise ValueError(f"Could no open video file: {original_filename}")
+            raise ValueError(f"Could not open video file: {original_filename}")
         
         fps = cap.get(cv2.CAP_PROP_FPS)
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -264,28 +263,27 @@ def classify_jump():
         frames_dir = Path('frames')
     
         frames_path = Path('existing') / filename 
-        print(f"🔍 Frames directory exists: {frames_dir.exists()}")
+        print(f"Frames directory exists: {frames_dir.exists()}")
 
         if frames_dir.exists():
-            print(f"🔍 Files in frames directory: {list(frames_dir.glob('*.npy'))}")
+            print(f"Files in frames directory: {list(frames_dir.glob('*.npy'))}")
         
         frames_path = Path('existing') / filename
-        print(f"🔍 Looking for: {frames_path}")
-        print(f"🔍 File exists: {frames_path.exists()}")
+        print(f"Looking for: {frames_path}")
+        print(f"File exists: {frames_path.exists()}")
         
         if not frames_path.exists():
             return jsonify({'error': f'Frames file not found: {filename}'}), 404
             
-        # Use the same preprocessing as your training script
         features = load_and_flatten(frames_path)
         
-        # Scale the features using the saved scaler
+        # scale the features using the saved scaler
         features_scaled = scaler.transform([features])
         
-        # Make prediction
+        # make prediction
         prediction = model.predict(features_scaled)[0]
         
-        # Get prediction probabilities
+        # get prediction probabilities
         probabilities = model.predict_proba(features_scaled)[0]
         confidence = max(probabilities)
 
@@ -307,13 +305,12 @@ def classify_jump():
                 'event': event,
                 'classification_attempted': True,
             })
-        
-        # Get all class probabilities for detailed results
+    
         class_probs = {}
         for i, class_name in enumerate(model.classes_):
-            class_probs[class_name] = float(probabilities[i])  # Convert numpy float to Python float
+            class_probs[class_name] = float(probabilities[i])
         
-        # Add top 3 predictions
+        # list top 3 predictions
         sorted_probs = sorted(class_probs.items(), key=lambda x: x[1], reverse=True)
         top_predictions = [
             {
@@ -347,28 +344,21 @@ def classify_own_jump():
         frames_dir = Path('frames')
     
         frames_path = Path('frames') / filename 
-        print(f"🔍 Frames directory exists: {frames_dir.exists()}")
+        print(f"Frames directory exists: {frames_dir.exists()}")
 
         if frames_dir.exists():
-            print(f"🔍 Files in frames directory: {list(frames_dir.glob('*.npy'))}")
+            print(f"Files in frames directory: {list(frames_dir.glob('*.npy'))}")
         
         frames_path = Path('frames') / filename
-        print(f"🔍 Looking for: {frames_path}")
-        print(f"🔍 File exists: {frames_path.exists()}")
+        print(f"Looking for: {frames_path}")
+        print(f"File exists: {frames_path.exists()}")
         
         if not frames_path.exists():
             return jsonify({'error': f'Frames file not found: {filename}'}), 404
             
-        # Use the same preprocessing as your training script
         features = load_and_flatten(frames_path)
-        
-        # Scale the features using the saved scaler
         features_scaled = scaler.transform([features])
-        
-        # Make prediction
         prediction = model.predict(features_scaled)[0]
-        
-        # Get prediction probabilities
         probabilities = model.predict_proba(features_scaled)[0]
         confidence = max(probabilities)
 
@@ -391,12 +381,10 @@ def classify_own_jump():
                 'classification_attempted': True,
             })
         
-        # Get all class probabilities for detailed results
         class_probs = {}
         for i, class_name in enumerate(model.classes_):
-            class_probs[class_name] = float(probabilities[i])  # Convert numpy float to Python float
+            class_probs[class_name] = float(probabilities[i])
         
-        # Add top 3 predictions
         sorted_probs = sorted(class_probs.items(), key=lambda x: x[1], reverse=True)
         top_predictions = [
             {
@@ -468,15 +456,12 @@ def upload_and_classify():
         pose_path = FRAMES_FOLDER / pose_filename
         np.save(str(pose_path), pose_data)
 
-        # immediately classify
         features = load_and_flatten(pose_path)
         features_scaled = scaler.transform([features])
-
         prediction = model.predict(features_scaled)[0]
         probabilities = model.predict_proba(features_scaled)[0]
         confidence = max(probabilities)
 
-        # get all class probabilities
         class_probs = {}
         for i, class_name in enumerate(model.classes_):
             class_probs[class_name] = float(probabilities[i])
@@ -533,31 +518,31 @@ print("🧹 Auto-cleanup thread started - files will be deleted after 1 hour")
 def serve_video(video_id):
     """Serve uploaded video files from the uploads folder"""
     try:
-        # Construct the video filename (assuming .mp4 extension)
+        # construct the video filename (assuming .mp4 extension)
         video_filename = f"{video_id}.mp4"
         
-        # Check if file exists in uploads folder
+        # check if file exists in uploads folder
         video_path = UPLOADS_FOLDER / video_filename
         
         if not video_path.exists():
-            print(f"❌ Video not found: {video_path}")
+            print(f"Video not found: {video_path}")
             return jsonify({'error': f'Video not found: {video_filename}'}), 404
         
-        print(f"✅ Serving video: {video_filename}")
+        print(f"Serving video: {video_filename}")
         
-        # Serve the video file with proper headers for video streaming
+        # serve the video file with proper headers for video streaming
         return send_from_directory(
-            str(UPLOADS_FOLDER),  # Convert Path to string
+            str(UPLOADS_FOLDER),  # convert Path to string
             video_filename, 
             mimetype='video/mp4',
             as_attachment=False
         )
         
     except Exception as e:
-        print(f"❌ Error serving video {video_id}: {str(e)}")
+        print(f"Error serving video {video_id}: {str(e)}")
         return jsonify({'error': f'Failed to serve video: {str(e)}'}), 500
 
-# Optional: Add a route to list available videos (for debugging)
+# route added to list available videos (for debugging)
 @app.route('/api/videos', methods=['GET'])
 def list_videos():
     """List all available videos in uploads folder"""
@@ -567,7 +552,7 @@ def list_videos():
         
         videos = []
         for video_file in UPLOADS_FOLDER.glob('*.mp4'):
-            video_id = video_file.stem  # filename without extension
+            video_id = video_file.stem 
             videos.append({
                 'video_id': video_id,
                 'filename': video_file.name,
@@ -578,7 +563,7 @@ def list_videos():
         return jsonify({'videos': videos})
         
     except Exception as e:
-        print(f"❌ Error listing videos: {str(e)}")
+        print(f"Error listing videos: {str(e)}")
         return jsonify({'error': f'Failed to list videos: {str(e)}'}), 500
 
 if __name__ == '__main__':

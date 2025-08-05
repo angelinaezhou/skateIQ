@@ -101,7 +101,7 @@ export default function Skaters({ name, event, filename, onSelect }: skatersProp
   return (
     <>
       <div className="skater" onClick={handleClick} style={{cursor: 'pointer'}}>
-        <LeadingIcon icon={Clapperboard} size={20} strokeWidth={2.9} />
+        <LeadingIcon icon={Clapperboard} size={20} strokeWidth={2.5} />
         <div className="description">
           <div className="title">{name}</div>
           <div className="event">{event}</div>
