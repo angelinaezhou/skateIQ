@@ -1,19 +1,21 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 
-# Install system dependencies for OpenCV
+WORKDIR /app
+
 RUN apt-get update && apt-get install -y \
-    libgl1-mesa-glx \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libgcc-s1 \
+    libgl1-mesa-glx \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /app
 COPY requirements.txt .
 RUN pip install -r requirements.txt
+
 COPY . .
 
-CMD gunicorn app:app --host=0.0.0.0 --port=$PORT
+EXPOSE 5000
+
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "app:app"]
