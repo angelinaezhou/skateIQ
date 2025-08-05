@@ -1,0 +1,5 @@
+[phases.setup]
+nixPkgs = ['libGL', 'glib', 'glibc', 'libgcc']
+
+[phases.install]
+dependsOn = ['setup']
