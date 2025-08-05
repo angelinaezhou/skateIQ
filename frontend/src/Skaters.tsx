@@ -3,6 +3,7 @@ import "./Skaters.css"
 import LeadingIcon from "./LeadingIcon";
 import { Play, X, Video, SquarePlay, Clapperboard } from "lucide-react"
 import { useState } from "react"
+import { API_BASE_URL } from "./config";
 
 type skatersProps = {
   name: string;
@@ -40,21 +41,21 @@ export default function Skaters({ name, event, filename, onSelect }: skatersProp
   }
 
   const handleClick = () => {
-    console.log('🎯 Before click - showVideo:', showVideo);
+    console.log('Before click - showVideo:', showVideo);
     const videoPath = getVideoPath(name, event);
     console.log('Video path:', videoPath);
     console.log('Full key:', `${name}-${event}`);
     setShowVideo(true);
-    console.log('🎯 After click - should be true', showVideo);
+    console.log('After click - should be true', showVideo);
     setClassificationResult(null);
   };
 
   const handleVideoEnd = async () => {
     setIsProcessing(true);
     try {
-      console.log('🚀 Making API call to classify jump...');
+      console.log('Making API call to classify jump...');
       
-      const response = await fetch('http://localhost:8000/api/classify-jump', {
+      const response = await fetch(`${API_BASE_URL}/api/classify-jump`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,20 +67,20 @@ export default function Skaters({ name, event, filename, onSelect }: skatersProp
         }),
       });
 
-      console.log('📡 Response status:', response.status);
+      console.log('Response status:', response.status);
       
       if (!response.ok) {
         const errorText = await response.text();
-        console.log('❌ Error response:', errorText);
+        console.log('Error response:', errorText);
         throw new Error(`HTTP error! status: ${response.status}`);
       }
 
       const result = await response.json();
-      console.log('✅ Classification result:', result);
+      console.log('Classification result:', result);
       setClassificationResult(result);
       
     } catch (error) {
-      console.error('❌ Classification failed:', error);
+      console.error('Classification failed:', error);
       setClassificationResult({
         jump_type: 'Classification failed - check backend connection',
         confidence: 0,

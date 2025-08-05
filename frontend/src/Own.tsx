@@ -37,7 +37,7 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
 
   // Create video URL for uploaded file (you'll need to serve uploaded videos)
   const getVideoUrl = (videoId: string) => {
-    const url = `${API_BASE_URL}/video/${videoId}`;
+    const url = `${API_BASE_URL}/api/video/${videoId}`;
     console.log(`🎥 Video URL for ${videoId}: ${url}`);
     return url;
   };
@@ -84,9 +84,9 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
       formData.append('event', 'Upload');
 
       console.log('🚀 Starting video upload and processing...');
-      console.log('🔗 Requesting:', 'http://localhost:8000/api/upload-and-classify');
+      console.log('🔗 Requesting:', `${API_BASE_URL}/api/upload-and-classify`);
 
-      const response = await fetch('http://localhost:8000/api/upload-and-classify', {
+      const response = await fetch(`${API_BASE_URL}/api/upload-and-classify`, {
         method: 'POST',
         body: formData,
       });
@@ -158,7 +158,7 @@ export default function Own({ onUploadSuccess, onUploadError, onClassificationRe
     setIsClassifying(true);
     
     try {
-      const response = await fetch('http://localhost:8000/api/classify-own-jump', {
+      const response = await fetch(`${API_BASE_URL}/api/classify-own-jump`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
