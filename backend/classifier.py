@@ -1,3 +1,4 @@
+# training model on .npy files
 import numpy as np
 from pathlib import Path
 from sklearn.ensemble import RandomForestClassifier
@@ -37,7 +38,7 @@ def load_dataset():
     y = []  # labels (jump types)
     filenames = []  # keep track of source files
     
-    print("📂 Loading dataset...")
+    print("Loading dataset...")
     
     for jump_type in JUMP_TYPES:
         jump_dir = DATA_DIR / jump_type
@@ -53,7 +54,7 @@ def load_dataset():
             print(f"Warning: No .npy files found in {jump_dir}")
             continue
         
-        print(f"   {jump_type}: {len(npy_files)} files")
+        print(f"{jump_type}: {len(npy_files)} files")
         
         for npy_file in npy_files:
             try:
@@ -77,9 +78,9 @@ def load_dataset():
     y = np.array(y)
     
     print(f"\Dataset loaded:")
-    print(f"   Total samples: {len(X)}")
-    print(f"   Feature dimensions: {X.shape}")
-    print(f"   Classes: {len(set(y))}")
+    print(f"Total samples: {len(X)}")
+    print(f"Feature dimensions: {X.shape}")
+    print(f"Classes: {len(set(y))}")
     
     # show class distribution
     class_counts = Counter(y)
@@ -112,18 +113,18 @@ def train_random_forest(X_train, y_train):
         verbose=1
     )
     
-    print(f"   Training with {len(X_train)} samples using 5-fold CV...")
+    print(f"Training with {len(X_train)} samples using 5-fold CV...")
     grid_search.fit(X_train, y_train)
     
-    print(f"   Best parameters: {grid_search.best_params_}")
-    print(f"   Best CV score: {grid_search.best_score_:.3f}")
+    print(f"Best parameters: {grid_search.best_params_}")
+    print(f"Best CV score: {grid_search.best_score_:.3f}")
     
     # return the best model
     return grid_search.best_estimator_
 
 def evaluate_model(model, X_test, y_test, class_names):
     """Evaluate model performance"""
-    print("\n📈 Model Performance:")
+    print("Model Performance:")
     
     # predictions
     y_pred = model.predict(X_test)

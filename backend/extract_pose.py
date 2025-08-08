@@ -1,3 +1,4 @@
+# creating .npy pose files from .mp4 video clip samples
 import os
 import numpy as np
 import cv2
@@ -5,7 +6,7 @@ from pathlib import Path
 import mediapipe as mp
 import time
 
-DATA_DIR = Path(__file__).parent / "data" / "lutz" / 'h'
+DATA_DIR = Path(__file__).parent / "data" 
 TARGET_LEN = 30  # number of frames to resample to
 ALLOWED_EXTENSIONS = {".mp4", ".mov", ".avi", ".mkv", ".MP4", ".MOV", ".AVI", ".MKV"}
 

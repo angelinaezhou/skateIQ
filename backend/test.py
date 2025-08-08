@@ -1,3 +1,4 @@
+# testing model on a singular .npy pose file
 import pickle
 import numpy as np
 from pathlib import Path
@@ -8,10 +9,9 @@ MAX_FRAMES = 30
 POSE_DIM = 132
 
 def load_and_flatten(pose_file: Path, max_frames=MAX_FRAMES):
-    """Same preprocessing as training script"""
     pose = np.load(pose_file)
     
-    print(f"   Loaded shape: {pose.shape}")
+    print(f"Loaded shape: {pose.shape}")
     
     if len(pose) > max_frames:
         pose = pose[:max_frames]
@@ -20,11 +20,10 @@ def load_and_flatten(pose_file: Path, max_frames=MAX_FRAMES):
         pose = np.vstack([pose, padding])
     
     flattened = pose.flatten()
-    print(f"   Flattened shape: {flattened.shape}")
+    print(f"Flattened shape: {flattened.shape}")
     return flattened
 
 def test_single_file(file_path: Path, model, scaler):
-    """Test classification on a single file"""
     print(f"Testing: {file_path}")
     
     if not file_path.exists():
@@ -34,7 +33,7 @@ def test_single_file(file_path: Path, model, scaler):
     try:
         features = load_and_flatten(file_path)
         features_scaled = scaler.transform([features])
-        print(f"   Scaled shape: {features_scaled.shape}")
+        print(f"Scaled shape: {features_scaled.shape}")
         
         # make prediction
         prediction = model.predict(features_scaled)[0]
@@ -58,7 +57,6 @@ def test_single_file(file_path: Path, model, scaler):
 
 
 def test_directory(test_dir: Path, model, scaler, max_files=10):
-    """Test classification on multiple files from a directory"""
     print(f"\Testing directory: {test_dir}")
     
     if not test_dir.exists():
@@ -86,7 +84,6 @@ def test_directory(test_dir: Path, model, scaler, max_files=10):
         print(f"   {filename}: {pred} ({conf:.3f})")
 
 def main():
-    """Main test function"""
     print("Model and Scaler Test Script")
     print("=" * 50)
     
