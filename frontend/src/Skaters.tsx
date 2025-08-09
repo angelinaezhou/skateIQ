@@ -1,7 +1,7 @@
 /* each of the skater's individual selection */
 import "./Skaters.css"
 import LeadingIcon from "./LeadingIcon";
-import { Play, X, Video, SquarePlay, Clapperboard } from "lucide-react"
+import { X, Clapperboard } from "lucide-react"
 import { useState } from "react"
 import { API_BASE_URL } from "./config";
 
