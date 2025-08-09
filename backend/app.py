@@ -44,7 +44,10 @@ def cleanup_old_files():
         time.sleep(3600)
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, origins=[
+    'http://localhost:3000',  # For local development
+    'https://angelinaezhou.github.io'  # For GitHub Pages
+])
 
 CONFIDENCE_THRESHOLD = 0.30
 
