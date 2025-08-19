@@ -12,7 +12,6 @@ env/
 
 # Data files
 *.npy
-*.pkl
 *.mp4
 *.mov
 *.avi
