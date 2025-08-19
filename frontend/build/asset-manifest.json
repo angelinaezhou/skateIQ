@@ -1,16 +1,16 @@
 {
   "files": {
-    "main.css": "/skateIQ/static/css/main.37fc9762.css",
+    "main.css": "/skateIQ/static/css/main.baf06e72.css",
     "main.js": "/skateIQ/static/js/main.7b7b7731.js",
     "static/js/453.d92d3477.chunk.js": "/skateIQ/static/js/453.d92d3477.chunk.js",
     "static/media/background.png": "/skateIQ/static/media/background.01cfbefcee8f2f77fbd9.png",
     "index.html": "/skateIQ/index.html",
-    "main.37fc9762.css.map": "/skateIQ/static/css/main.37fc9762.css.map",
+    "main.baf06e72.css.map": "/skateIQ/static/css/main.baf06e72.css.map",
     "main.7b7b7731.js.map": "/skateIQ/static/js/main.7b7b7731.js.map",
     "453.d92d3477.chunk.js.map": "/skateIQ/static/js/453.d92d3477.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.37fc9762.css",
+    "static/css/main.baf06e72.css",
     "static/js/main.7b7b7731.js"
   ]
 }
